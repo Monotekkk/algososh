@@ -1,63 +1,94 @@
-import React, {useState, ChangeEvent, MouseEvent} from "react";
-import {SolutionLayout} from "../ui/solution-layout/solution-layout";
-import {Input} from "../ui/input/input";
-import {Button} from "../ui/button/button";
+import React, { useState, ChangeEvent, FormEvent } from "react";
+import { SolutionLayout } from "../ui/solution-layout/solution-layout";
+import { Input } from "../ui/input/input";
+import { Button } from "../ui/button/button";
 import style from "./string.module.css";
-import {Circle} from "../ui/circle/circle";
-import {ElementStates} from "../../types/element-states";
+import { Circle } from "../ui/circle/circle";
+import { ElementStates } from "../../types/element-states";
+import { DELAY_IN_MS } from "../../constants/delays";
 
 export const StringComponent: React.FC = () => {
-    const [value, setValue] = useState<string>('');
-    const [visible, setVisible] = useState<boolean>(false);
-    const [list, setList] = useState<Array<string>>([]);
-    const [color, setColor] = useState<number | null>(null);
-    const setResult = (e: ChangeEvent<HTMLInputElement>) => {
-        setValue(e.target.value);
+    type TResult = {
+        value: string;
+        state: ElementStates
     }
-    let arr: string[];
-    const swap = (arr: string[], firstIndex: number, secondIndex: number): void => {
-            const temp = arr[firstIndex];
-            arr[firstIndex] = arr[secondIndex];
-            arr[secondIndex] = temp;
+    const [isValid, setIsValid] = useState<boolean>(false);
+    const [inputValue, setInputValue] = useState<string>('');
+    const [result, setResult] = useState<TResult[]>([]);
+    const [isLoader, setIsLoader] = useState(false);
+    const maxLength = 11;
+    function delay(time: number = 0) {
+        return new Promise(resolve => setTimeout(resolve, time));
     }
-    const reverse = (string: string) => {
-        arr = string.split('');
-        for (let index = 0; index < Math.floor(arr.length / 2); index++) {
-            setTimeout(()=>{
-                swap(arr, index, arr.length - 1 - index);
-                setColor(index);
-                setList([...arr]);
-            }, 1000*index)
 
+    function handleInput(e: ChangeEvent<HTMLInputElement>) {
+        const curLength = e.target.value.length;
+        setInputValue(e.target.value);
+        if (curLength > 0 && curLength <= maxLength) {
+            setIsValid(true);
+        } else {
+            setIsValid(false);
         }
     }
-    const colorChanger = (index:number) => {
-        if (!color){
-            return ElementStates.Default
+
+    function handleSubmit(e: FormEvent) {
+        e.preventDefault();
+        reverse(inputValue);
+    }
+    async function reverse(stringValue: string) {
+        const arr = stringValue.split('');
+        const coloredArr: TResult[] = arr.map(item => {
+            return {
+                value: item,
+                state: ElementStates.Default
+            }
+        })
+        setResult(coloredArr);
+        setIsValid(false);
+        setIsLoader(true);
+        await delay(DELAY_IN_MS);
+
+        let i = 0;
+        let middle = Math.floor(arr.length / 2);
+
+        while (i <= middle) {
+
+            if (arr.length % 2 === 0 && i === middle) break;
+
+            coloredArr[i].state = ElementStates.Changing;
+            coloredArr[coloredArr.length - 1 - i].state = ElementStates.Changing;
+            setResult([...coloredArr]);
+            await delay(DELAY_IN_MS);
+
+            const temp = coloredArr[i];
+            coloredArr[i] = coloredArr[coloredArr.length - 1 - i];
+            coloredArr[coloredArr.length - 1 - i] = temp;
+
+            coloredArr[i].state = ElementStates.Modified;
+            coloredArr[coloredArr.length - 1 - i].state = ElementStates.Modified;
+            setResult([...coloredArr]);
+            await delay(DELAY_IN_MS);
+
+            i++;
         }
-        if ( index < color || index > list.length-1-color){
-          return ElementStates.Modified
-      }
+        setIsValid(true);
+        setIsLoader(false);
     }
-    const onClick = (e: MouseEvent<HTMLButtonElement>) => {
-        setVisible(true);
-        reverse(value);
-    }
+
     return (
         <SolutionLayout title="Строка">
             <div className={style.container}>
-                <form action="" className={style.form}>
+                <form action="" className={style.form} onSubmit={handleSubmit}>
                     <div className={style.column}>
-                        <Input extraClass={style.input} maxLength={11} value={value} onChange={setResult}/>
+                        <Input extraClass={style.input} maxLength={maxLength} value={inputValue} onChange={handleInput} />
                         <p className={style.pre}>Максимум — 11 символов</p>
                     </div>
-                    <Button text="Развернуть" onClick={e => onClick(e)}/>
+                    <Button type="submit" text="Развернуть" disabled={!isValid} isLoader={isLoader} />
                 </form>
                 <div className={style.result}>
                     {
-                        visible &&
-                        list.map((letter, i) => {
-                            return <Circle key={i} letter={letter} state={colorChanger(i)}/>
+                        result.map((item, index) => {
+                            return <Circle key={index} letter={item.value} state={item.state} />
                         })
                     }
                 </div>
