@@ -78,7 +78,7 @@ export const StringComponent: React.FC = () => {
     return (
         <SolutionLayout title="Строка">
             <div className={style.container}>
-                <form action="" className={style.form} onSubmit={handleSubmit}>
+                <form className={style.form} onSubmit={handleSubmit}>
                     <div className={style.column}>
                         <Input extraClass={style.input} maxLength={maxLength} value={inputValue} onChange={handleInput} />
                         <p className={style.pre}>Максимум — 11 символов</p>
