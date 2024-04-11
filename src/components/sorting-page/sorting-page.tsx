@@ -5,32 +5,32 @@ import { RadioInput } from "../ui/radio-input/radio-input";
 import style from './sorting-page.module.css';
 import { Direction } from "../../types/direction";
 export const SortingPage: React.FC = () => {
-  const [isValid, setIsValid] = useState<boolean>(false);
-  const [inputValue, setInputValue] = useState<string>('');
-  const [result, setResult] = useState<number[]>([]);
+  const [sort, setSort] = useState<string>('');
   const [isLoader, setIsLoader] = useState(false);
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setResult([]);
 
   }
   return (
     <SolutionLayout title="Сортировка массива">
       <div className={style.container}>
-                <form className={style.form} onSubmit={handleSubmit}>
-                    <RadioInput label="Выбор"/>
-                    <RadioInput label="Пузырек"/>
-                    <Button type="button" text="По возрастанию" sorting={Direction.Ascending} isLoader={isLoader} />
-                    <Button type="button" text="По убыванию" sorting={Direction.Descending} isLoader={isLoader} />
-                    <Button type="button" text="Новый массив" isLoader={isLoader} />
+        <form className={style.form} onSubmit={handleSubmit}>
+          <div className={style.groupButton}>
+            <RadioInput label="Выбор" onClick={() => !sort || sort === 'bubble' ? setSort('choice') : setSort('')} checked={sort === 'choice' ? true : false} />
+            <RadioInput label="Пузырек" onClick={() => !sort || sort === 'choice' ? setSort('bubble') : setSort('')} checked={sort === 'bubble' ? true : false} />
+          </div>
+          <div className={style.groupButton}>
+            <Button type="button" text="По возрастанию" sorting={Direction.Ascending} isLoader={isLoader} />
+            <Button type="button" text="По убыванию" sorting={Direction.Descending} isLoader={isLoader} />
+          </div>
+          <Button type="button" text="Новый массив" isLoader={isLoader} />
+        </form>
+        <div className={style.result}>
+          {
 
-                </form>
-                <div className={style.result}>
-                    {
-
-                    }
-                </div>
-            </div>
+          }
+        </div>
+      </div>
     </SolutionLayout>
   );
 };

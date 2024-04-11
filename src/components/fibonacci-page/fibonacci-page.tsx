@@ -28,14 +28,15 @@ export const FibonacciPage: React.FC = () => {
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setResult([]);
-    fibonacci(+inputValue);
+    setIsLoader(true);
+    fibonacci(+inputValue).finally(() => { setIsLoader(false) })
   }
   async function fibonacci(n: number) {
     let arr: number[] = [];
-    for(let i = 0; i < n+1; i++){
-     i && await delay(SHORT_DELAY_IN_MS);
-     i < 2 && arr.push(1);
-     i >= 2 && arr.push(arr[i-2] + arr[i-1]);
+    for (let i = 0; i < n + 1; i++) {
+      i && await delay(SHORT_DELAY_IN_MS);
+      i < 2 && arr.push(1);
+      i >= 2 && arr.push(arr[i - 2] + arr[i - 1]);
       setResult([...arr]);
     }
     return arr[n];
@@ -53,7 +54,7 @@ export const FibonacciPage: React.FC = () => {
         <div className={style.result}>
           {
             result.map((item, index) => {
-              return <Circle key={index} letter={item.toString()} index={index} extraClass="mb-20"/>
+              return <Circle key={index} letter={item.toString()} index={index} extraClass="mb-20" />
             })
           }
         </div>
