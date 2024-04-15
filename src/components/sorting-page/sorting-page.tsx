@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, FormEvent } from "react";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Button } from "../ui/button/button";
 import { RadioInput } from "../ui/radio-input/radio-input";
@@ -12,14 +12,13 @@ export const SortingPage: React.FC = () => {
     item: number,
     state: ElementStates
   }
-  const [algorithm, setAlgorithm] = useState<string>('bubble');
-  const [sort, setSort] = useState<string>('');
+  const [algorithm, setAlgorithm] = useState<string>('');
   const [isLoader, setIsLoader] = useState<boolean>(false);
   const [array, setArray] = useState<Array<TArrayElements>>([]);
+
   function handleSubmit(e: FormEvent) {
-    setAlgorithm('');
-    setSort('');
     e.preventDefault();
+    setAlgorithm('');
     randomArr();
   }
   function delay(time: number = 0) {
@@ -38,40 +37,64 @@ export const SortingPage: React.FC = () => {
     setArray(arr);
   }
   const swap = (arr: TArrayElements[], firstIndex: number, secondIndex: number): void => {
-
     const temp = arr[firstIndex];
     arr[firstIndex] = arr[secondIndex];
     arr[secondIndex] = temp;
   };
-  async function selectionSort() {
-    const { length } = array;
-    let arr = array;
-    for (let i = 0; i < length - 1; i++) {
+  async function selectionSort(arr: TArrayElements[], type: 'asc' | 'desc') {
+    arr.forEach(item => item.state = ElementStates.Default);
+    setArray([...arr]);
+    for (let i = 0; i <= array.length - 1; i++) {
       let maxInd = i;
-      arr[i] = {item: arr[i].item, state: ElementStates.Modified};
-      for (let j = i + 1; j < length; j++) {
-        if (arr[j].item > arr[maxInd].item) {
-          maxInd = j;
-        }
-        await delay(DELAY_IN_MS);
+      arr[i].state = ElementStates.Changing;
+      for (let j = i + 1; j < arr.length; j++) {
+        arr[j].state = ElementStates.Changing;
         setArray([...arr]);
+        await delay(DELAY_IN_MS);
+        arr[j].state = ElementStates.Default;
+        setArray([...arr]);
+        if (type === 'asc' && arr[j].item < arr[maxInd].item) {
+          arr[maxInd].state = ElementStates.Default;
+          maxInd = j
+          arr[maxInd].state = ElementStates.Changing;
+        };
+        if (type === 'desc' && arr[j].item > arr[maxInd].item) {
+          arr[maxInd].state = ElementStates.Default;
+          maxInd = j;
+          arr[maxInd].state = ElementStates.Changing;
+        };;
       }
-      arr[i] = {item: arr[i].item, state: ElementStates.Changing};
-      swap(arr, maxInd, i);
+      swap(arr, i, maxInd);
+      arr[maxInd].state = ElementStates.Default;
+      arr[i].state = ElementStates.Modified;
+      setArray([...arr]);
     }
   };
-  async function bubbleSort() {
-    let arr = array;
+  async function bubbleSort(arr: TArrayElements[], type: 'asc' | 'desc') {
+    arr.forEach(item => item.state = ElementStates.Default);
+    setArray([...arr]);
     for (let i = 0; i < arr.length - 1; i++) {
       for (let j = 0; j < arr.length - i - 1; j++) {
-
-        if (arr[j].item > arr[j + 1].item) {
+        arr[j].state = ElementStates.Changing;
+        arr[j + 1].state = ElementStates.Changing;
+        await delay(DELAY_IN_MS);
+        setArray([...arr]);
+        if ((type === 'asc' && arr[j].item > arr[j + 1].item) || (type === 'desc' && arr[j].item < arr[j + 1].item)) {
           swap(arr, j, j + 1);
         }
+        arr[j].state = ElementStates.Default;
+        arr[j + 1].state = ElementStates.Default;
         await delay(DELAY_IN_MS);
         setArray([...arr]);
       }
+      arr[arr.length - i - 1].state = ElementStates.Modified;
     }
+    arr[0].state = ElementStates.Modified;
+    setArray([...arr])
+  }
+  const clearForm = () => {
+    setIsLoader(false);
+    setAlgorithm('');
   }
   return (
     <SolutionLayout title="Сортировка массива">
@@ -80,20 +103,26 @@ export const SortingPage: React.FC = () => {
           <div className={style.groupButton}>
             <RadioInput label="Выбор" onClick={() => {
               !algorithm || algorithm === 'bubble' ? setAlgorithm('choice') : setAlgorithm('')
-              setIsLoader(true);
-              selectionSort().then(() => setIsLoader(false)).then(()=>console.log(array))
             }}
               checked={algorithm === 'choice' ? true : false} />
             <RadioInput label="Пузырек" onClick={() => {
               !algorithm || algorithm === 'choice' ? setAlgorithm('bubble') : setAlgorithm('')
-              setIsLoader(true);
-              bubbleSort().then(() => setIsLoader(false))
             }}
               checked={algorithm === 'bubble' ? true : false} />
           </div>
           <div className={style.groupButton}>
-            <Button type="button" text="По возрастанию" sorting={Direction.Ascending} isLoader={isLoader} onClick={() => setSort('ascending')} />
-            <Button type="button" text="По убыванию" sorting={Direction.Descending} isLoader={isLoader} onClick={() => setSort('descending')} />
+            <Button type="button" text="По возрастанию" sorting={Direction.Ascending} isLoader={isLoader}
+              onClick={() => {
+                array && algorithm && setIsLoader(true);
+                array && algorithm === 'bubble' && bubbleSort(array, 'asc').then(() => clearForm())
+                array && algorithm === 'choice' && selectionSort(array, 'asc').then(() => clearForm())
+              }} />
+            <Button type="button" text="По убыванию" sorting={Direction.Descending} isLoader={isLoader}
+              onClick={() => {
+                array && algorithm && setIsLoader(true);
+                array && algorithm === 'bubble' && bubbleSort(array, 'desc').then(() => clearForm())
+                array && algorithm === 'choice' && selectionSort(array, 'desc').then(() => clearForm())
+              }} />
           </div>
           <Button type="button" onClick={handleSubmit} text="Новый массив" isLoader={isLoader} />
         </form>
