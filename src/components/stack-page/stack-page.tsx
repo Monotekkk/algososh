@@ -10,7 +10,7 @@ export const StackPage: React.FC = () => {
       <form>
         <div className={style.container}>
           <div className={style.inputGroup}>
-            <Input placeholder="Введите текст" isLimitText={true} type="text" maxLength={4} />
+            <Input placeholder="Введите текст" isLimitText={true} type="text" maxLength={4} extraClass={style.input}/>
             <Button text="Добавить" type='button' />
             <Button text="Удалить" type='button' />
           </div>
