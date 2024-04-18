@@ -3,9 +3,10 @@ import {SolutionLayout} from "../ui/solution-layout/solution-layout";
 import style from './queue-page.module.css'
 import {Input} from "../ui/input/input";
 import {Button} from "../ui/button/button";
-import {Circle} from "../ui/circle/circle";
 import {ElementStates} from "../../types/element-states";
 import {SHORT_DELAY_IN_MS} from "../../constants/delays";
+import {Queue} from "../../classes/queue";
+import {Circle} from "../ui/circle/circle";
 
 type TValid = {
     addButton: boolean,
@@ -16,89 +17,70 @@ type TElement = {
     state: ElementStates
 }
 export const QueuePage: React.FC = () => {
-    const [result, setResult] = useState<Array<TElement>>([
-        {
-            element: '',
-            state: ElementStates.Default
-        },
-        {
-            element: '',
-            state: ElementStates.Default
-        },
-        {
-            element: '',
-            state: ElementStates.Default
-        },
-        {
-            element: '',
-            state: ElementStates.Default
-        },
-        {
-            element: '',
-            state: ElementStates.Default
-        },
-        {
-            element: '',
-            state: ElementStates.Default
-        },
-        {
-            element: '',
-            state: ElementStates.Default
-        }]);
+    const [result, setResult] = useState(new Queue<TElement>(7));
     const [value, setValue] = useState<string>('');
     const [isValid, setIsValid] = useState<TValid>({addButton: false, resetButton: false});
-    const [head, setHead] = useState<number>(0);
-    const [tail, setTail] = useState<number>(0);
-    const [visible, setVisible] = useState<boolean>(false);
+    const initialArr: TElement[] = [...new Array(7)].map(() => {
+        return {
+            element: '',
+            state: ElementStates.Default
+        }
+    });
+    const [resultArray, setResultArray] = useState<Array<TElement>>(initialArr);
+
     useEffect(() => {
-        setIsValid({addButton: Boolean(value), resetButton: Boolean(result.length)});
-    }, [value, result]);
+        setIsValid({addButton: Boolean(value), resetButton: Boolean(resultArray.length)});
+    }, [value, resultArray]);
 
     function delay(time: number = 0) {
         return new Promise(resolve => setTimeout(resolve, time));
     }
 
-    async function enqueue(value: string) {
-        let arr = result;
-        arr[tail] = {
-            element: value,
-            state: ElementStates.Changing
-        };
-        !visible && setVisible(true);
-        !visible && await delay(SHORT_DELAY_IN_MS);
-        setTail(tail + 1);
-        setResult([...arr]);
-        await delay(SHORT_DELAY_IN_MS);
-        setValue('');
-        arr[tail].state = ElementStates.Default
-        setResult([...arr]);
+    function getFilledArray() {
+        return [...result.getValues()].map(item => {
+            return item ? item : {
+                element: '',
+                state: ElementStates.Default
+            }
+        })
+    }
 
+    async function enqueue(value: string) {
+        if (result.getTail() >= 7) return 0
+        setValue('');
+        let coloredArr = getFilledArray();
+        coloredArr[result.getTail()].state = ElementStates.Changing;
+        setResultArray([...coloredArr]);
+        await delay(SHORT_DELAY_IN_MS);
+
+        result.enqueue({
+            element: value,
+            state: ElementStates.Default
+        })
+
+        coloredArr = getFilledArray();
+
+        coloredArr[result.getTail() - 1].state = ElementStates.Default;
+        setResultArray([...coloredArr]);
     }
 
     async function dequeue() {
-        const arr = result;
-        arr[head].state = ElementStates.Changing;
-        setHead(head + 1);
-        setResult([...arr]);
+        if (result.getHead() >= 7 || result.isEmpty()) return 0;
+        let coloredArr = getFilledArray();
+        coloredArr[result.getHead()].state = ElementStates.Changing;
+        setResultArray([...coloredArr]);
         await delay(SHORT_DELAY_IN_MS);
-        setValue('');
-        arr[head] = {
-            element: '',
-            state: ElementStates.Default
-        }
-        setResult([...arr]);
+
+        result.dequeue();
+
+        coloredArr = getFilledArray();
+        coloredArr[result.getTail() - 1].state = ElementStates.Default;
+        setResultArray([...coloredArr]);
     }
 
     const resetForm = () => {
-        setValue('');
-        setTail(0);
-        setHead(0);
-        setVisible(false);
-        const arr = result;
-        arr.forEach((item) => {
-            item.element = '';
-        })
-        setResult([...arr]);
+        setResult(new Queue<TElement>(7));
+        setResultArray(initialArr);
     }
     return (
         <SolutionLayout title="Очередь">
@@ -120,16 +102,17 @@ export const QueuePage: React.FC = () => {
             </form>
             <div className={style.containerResult}>
                 {
-                    result.map((item, index) =>
-                        <Circle
+                    resultArray.map((item, index) => {
+                        return <Circle
+                            head={(index === result.getHead() && result.getTail() !== 0)
+                            || (result.isEmpty() && index === 6 && index === result.getTail() - 1) ? 'head' : null}
+                            tail={index === result.getTail() - 1 && !result.isEmpty() ? 'tail' : null}
+                            index={index}
                             key={index}
                             letter={item.element}
-                            index={index}
-                            head={visible && head === index ? 'head' : null}
                             state={item.state}
-                            tail={visible && tail === index ? 'tail' : null}
                         />
-                    )
+                    })
                 }
             </div>
         </SolutionLayout>
