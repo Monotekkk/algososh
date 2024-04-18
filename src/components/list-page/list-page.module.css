@@ -1,0 +1,41 @@
+.form {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    width: 100%;
+    gap: 38px 12px;
+    max-width: 952px;
+}
+
+.input {
+    width: 204px;
+}
+
+.btn {
+    width: 175px;
+}
+
+.btnIndex {
+    width: 362px;
+}
+
+.board {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 110px 16px;
+    width: 100%;
+    max-width: 952px;
+    margin: 110px auto;
+    min-height: 204px;
+    list-style: none;
+    padding: 0;
+}
+
+.element {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
