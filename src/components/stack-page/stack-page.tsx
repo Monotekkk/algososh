@@ -18,7 +18,9 @@ type TElement = {
 export const StackPage: React.FC = () => {
     const [result, setResult] = useState<Array<TElement>>([]);
     const [value, setValue] = useState<string>('');
-    const [isValid, setIsValid] = useState<TValid>({addButton: false, resetButton: false})
+    const [isValid, setIsValid] = useState<TValid>({addButton: false, resetButton: false});
+    const [isLoaderAdd, setIsLoaderAdd] = useState<boolean>(false);
+    const [isLoaderPop, setIsLoaderPop] = useState<boolean>(false);
     useEffect(() => {
         setIsValid({addButton: Boolean(value), resetButton: Boolean(result.length)});
     }, [value, result]);
@@ -28,6 +30,7 @@ export const StackPage: React.FC = () => {
     }
 
     async function addElement(value: string) {
+        setIsLoaderAdd(true);
         let arr = result;
         arr.push({
             element: value,
@@ -41,6 +44,7 @@ export const StackPage: React.FC = () => {
     }
 
     async function popElement() {
+        setIsLoaderPop(true);
         const arr = result;
         arr[arr.length - 1].state = ElementStates.Changing
         setResult([...arr]);
@@ -65,10 +69,10 @@ export const StackPage: React.FC = () => {
                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                    setValue(e.target.value)
                                }} value={value}/>
-                        <Button text="Добавить" type='button' onClick={() => addElement(value)}
-                                disabled={!isValid.addButton}/>
-                        <Button text="Удалить" type='button' onClick={() => popElement()}
-                                disabled={!isValid.resetButton}/>
+                        <Button text="Добавить" type='button' onClick={() => addElement(value).then(()=>setIsLoaderAdd(false))}
+                                disabled={!isValid.addButton} isLoader={isLoaderAdd}/>
+                        <Button text="Удалить" type='button' onClick={() => popElement().then(()=>setIsLoaderPop(false))}
+                                disabled={!isValid.resetButton} isLoader={isLoaderPop}/>
                     </div>
                     <Button text="Очистить" type='reset' onClick={() => resetForm()} disabled={!isValid.resetButton}/>
                 </div>

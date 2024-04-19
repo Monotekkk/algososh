@@ -20,6 +20,8 @@ export const QueuePage: React.FC = () => {
     const [result, setResult] = useState(new Queue<TElement>(7));
     const [value, setValue] = useState<string>('');
     const [isValid, setIsValid] = useState<TValid>({addButton: false, resetButton: false});
+    const [isLoaderEnqueue, setIsLoaderEnqueue] = useState<boolean>(false);
+    const [isLoaderDequeue, setIsLoaderDequeue] = useState<boolean>(false);
     const initialArr: TElement[] = [...new Array(7)].map(() => {
         return {
             element: '',
@@ -46,6 +48,7 @@ export const QueuePage: React.FC = () => {
     }
 
     async function enqueue(value: string) {
+        setIsLoaderEnqueue(true);
         if (result.getTail() >= 7) return 0
         setValue('');
         let coloredArr = getFilledArray();
@@ -65,6 +68,7 @@ export const QueuePage: React.FC = () => {
     }
 
     async function dequeue() {
+        setIsLoaderDequeue(true);
         if (result.getHead() >= 7 || result.isEmpty()) return 0;
         let coloredArr = getFilledArray();
         coloredArr[result.getHead()].state = ElementStates.Changing;
@@ -92,10 +96,10 @@ export const QueuePage: React.FC = () => {
                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                    setValue(e.target.value)
                                }} value={value}/>
-                        <Button text="Добавить" type='button' onClick={() => enqueue(value)}
-                                disabled={!isValid.addButton}/>
-                        <Button text="Удалить" type='button' onClick={() => dequeue()}
-                                disabled={!isValid.resetButton}/>
+                        <Button text="Добавить" type='button' onClick={() => enqueue(value).then(()=>setIsLoaderEnqueue(false))}
+                                disabled={!isValid.addButton} isLoader={isLoaderEnqueue}/>
+                        <Button text="Удалить" type='button' onClick={() => dequeue().then(()=>setIsLoaderDequeue(false))}
+                                disabled={!isValid.resetButton} isLoader={isLoaderDequeue}/>
                     </div>
                     <Button text="Очистить" type='reset' onClick={() => resetForm()} disabled={!isValid.resetButton}/>
                 </div>
