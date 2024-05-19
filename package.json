@@ -1,10 +1,10 @@
 {
-  "name": "algorithms-project",
-  "version": "0.1.0",
-  "private": true,
+  "name": "y",
+  "version": "y",
+  "private": false,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.2",
-    "@testing-library/react": "^15.0.7",
+    "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.4.0",
     "@types/node": "^16.11.22",
@@ -47,12 +47,11 @@
   "devDependencies": {
     "@types/canvas-confetti": "^1.6.4",
     "@types/react-router-dom": "^5.3.3",
+    "@types/react-test-renderer": "^18.3.0",
     "cypress": "^13.9.0",
     "eslint-plugin-cypress": "^3.2.0",
-    "fetch-mock": "^9.11.0",
     "gh-pages": "^6.1.1",
-    "react-test-renderer": "^18.3.1",
-    "redux-mock-store": "^1.5.4"
+    "react-test-renderer": "17.0.2"
   },
   "main": "index.tsx",
   "repository": "y",

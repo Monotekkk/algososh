@@ -2,39 +2,49 @@ import renderer from 'react-test-renderer';
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Button } from "./button";
 
-it("Кнопка с текстом", () => {
+it('button with text', () => {
     const tree = renderer
-        .create(<Button text="Кнопка"/>)
+        .create(<Button text="button test 2 text" />)
         .toJSON();
     expect(tree).toMatchSnapshot();
 });
 
-it("Кнопка без текста", () => {
+
+it('button without test', () => {
     const tree = renderer
         .create(<Button />)
         .toJSON();
     expect(tree).toMatchSnapshot();
 });
 
-it("Заблокированная кнопка", () => {
+
+it('blocked button', () => {
     const tree = renderer
-        .create(<Button disabled={true}/>)
+        .create(<Button disabled={true} />)
         .toJSON();
     expect(tree).toMatchSnapshot();
 });
 
-it("Кнопка с индикацией загрузки", () => {
+
+it('button with loader', () => {
     const tree = renderer
-        .create(<Button isLoader={true}/>)
+        .create(<Button isLoader={true} />)
         .toJSON();
     expect(tree).toMatchSnapshot();
 });
 
-it("Кнопка: корректность вызова колбека при клике", () => {
+it('button handler', () => {
     window.alert = jest.fn();
-    render(<Button text="Кнопка"
-                   />);
-    const btn = screen.getByText("Кнопка");
-    fireEvent.click(btn);
-    expect(window.alert).toHaveBeenCalledWith("Кнопка нажата");
+
+    const onClickTest = () => {
+        alert('ClickHandler')
+    }
+
+    render(<Button text="button handle click test" onClick={onClickTest} />)
+
+    const button = screen.getByText("button handle click test");
+
+    fireEvent.click(button);
+
+    expect(window.alert).toHaveBeenCalledWith('ClickHandler');
 });
