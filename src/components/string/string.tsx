@@ -102,7 +102,7 @@ export const StringComponent: React.FC = () => {
                         data-cy="button"
                     />
                 </form>
-                <div className={`${style.result}`} data-testid="resultLayout" data-cy="board">
+                <div className={`${style.resulty}`} data-testid="resultLayout" data-cy="board">
                     {
                         result.map((item, index) => {
                             return <Circle

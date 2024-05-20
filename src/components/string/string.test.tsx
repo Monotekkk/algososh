@@ -20,25 +20,23 @@ describe('Реверс строки', () => {
     const output_4 = '';
 
     it('с чётным количеством символов: ' + input_1 + ' -> ' + output_1, async () => {
-        // https://stackoverflow.com/questions/75735931/cannot-pass-props-object-to-reacttypescript-component
         render(<BrowserRouter><StringComponent /></BrowserRouter>);
         const input = screen.getByTestId('input');
         const button = screen.getByTestId('button');
         const resultLayout = screen.getByTestId('resultLayout');
 
-        // 1. Insert input value
         fireEvent.change(input, {
             target: { value: input_1 }
         });
-        // 2. Click on submit button
+
         fireEvent.click(button);
-        // 3. Wait for an animation to finish
+
         await waitFor(() => expect(screen.getByTestId('input')).not.toBeDisabled(), {
             timeout: SINGLE_TEST_TIMEOUT
         });
-        // 3. Get DOM elements of circles
+
         const result = Array.from(resultLayout.childNodes).map((item) => item.textContent).join('');
-        // 4. Compare input and output
+
         expect(result).toBe(output_1);
     }, SINGLE_TEST_TIMEOUT);
 
@@ -48,19 +46,19 @@ describe('Реверс строки', () => {
         const button = screen.getByTestId('button');
         const resultLayout = screen.getByTestId('resultLayout');
 
-        // 1. Insert input value
+
         fireEvent.change(input, {
             target: { value: input_2 }
         });
-        // 2. Click on submit button
+
         fireEvent.click(button);
-        // 3. Wait for an animation to finish
+
         await waitFor(() => expect(screen.getByTestId('input')).not.toBeDisabled(), {
             timeout: SINGLE_TEST_TIMEOUT
         });
-        // 3. Get DOM elements of circles
+
         const result = Array.from(resultLayout.childNodes).map((item) => item.textContent).join('');
-        // 4. Compare input and output
+
         expect(result).toBe(output_2);
     }, SINGLE_TEST_TIMEOUT);
 
@@ -70,19 +68,19 @@ describe('Реверс строки', () => {
         const button = screen.getByTestId('button');
         const resultLayout = screen.getByTestId('resultLayout');
 
-        // 1. Insert input value
+
         fireEvent.change(input, {
             target: { value: input_3 }
         });
-        // 2. Click on submit button
+
         fireEvent.click(button);
-        // 3. Wait for an animation to finish
+
         await waitFor(() => expect(screen.getByTestId('input')).not.toBeDisabled(), {
             timeout: SINGLE_TEST_TIMEOUT
         });
-        // 3. Get DOM elements of circles
+
         const result = Array.from(resultLayout.childNodes).map((item) => item.textContent).join('');
-        // 4. Compare input and output
+
         expect(result).toBe(output_3);
     }, SINGLE_TEST_TIMEOUT);
 
@@ -92,19 +90,19 @@ describe('Реверс строки', () => {
         const button = screen.getByTestId('button');
         const resultLayout = screen.getByTestId('resultLayout');
 
-        // 1. Insert input value
+
         fireEvent.change(input, {
             target: { value: input_4 }
         });
-        // 2. Click on submit button
+
         fireEvent.click(button);
-        // 3. Wait for an animation to finish
+
         await waitFor(() => expect(screen.getByTestId('input')).not.toBeDisabled(), {
             timeout: SINGLE_TEST_TIMEOUT
         });
-        // 3. Get DOM elements of circles
+
         const result = Array.from(resultLayout.childNodes).map((item) => item.textContent).join('');
-        // 4. Compare input and output
+
         expect(result).toBe(output_4);
     }, SINGLE_TEST_TIMEOUT);
 });
