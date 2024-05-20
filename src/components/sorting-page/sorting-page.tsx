@@ -1,155 +1,212 @@
-import React, {useState, FormEvent, useEffect} from "react";
+import React from "react";
+import style from "./sorting-page.module.css";
+
 import {SolutionLayout} from "../ui/solution-layout/solution-layout";
 import {Button} from "../ui/button/button";
 import {RadioInput} from "../ui/radio-input/radio-input";
-import style from './sorting-page.module.css';
 import {Direction} from "../../types/direction";
 import {Column} from "../ui/column/column";
-import {DELAY_IN_MS} from "../../constants/delays";
 import {ElementStates} from "../../types/element-states";
+import {SHORT_DELAY_IN_MS} from "../../constants/delays";
 
-export const SortingPage: React.FC = () => {
-    type TArrayElements = {
-        item: number,
-        state: ElementStates
-    }
-    const [algorithm, setAlgorithm] = useState<string>('');
-    const [isLoader, setIsLoader] = useState<boolean>(false);
-    const [isLoaderAsc, setIsLoaderAsc] = useState<boolean>(false);
-  const [isLoaderDesc, setIsLoaderDesc] = useState<boolean>(false);
-  const [array, setArray] = useState<Array<TArrayElements>>([]);
+export const SortingPage: React.FC<{ arr?: number[] }> = ({arr}) => {
+    type TResult = {
+        value: number;
+        state: ElementStates;
+    };
 
-    function handleSubmit(e: FormEvent) {
-        e.preventDefault();
-        setAlgorithm('');
-        randomArr();
-    }
+    const [isValid, setIsValid] = React.useState(true);
+    const [result, setResult] = React.useState<TResult[]>(
+        arr ?
+            arr.map((item) => {
+                return {value: item, state: ElementStates.Default}
+            })
+            : getRandomArr());
+    const [isLoaderASC, setIsLoaderASC] = React.useState(false);
+    const [isLoaderDESC, setIsLoaderDESC] = React.useState(false);
 
     function delay(time: number = 0) {
         return new Promise(resolve => setTimeout(resolve, time));
     }
 
-    const randomArr = () => {
-        const arr: TArrayElements[] = [];
-        const minLen = 3;
-        const maxLen = 17;
-        const maxValue = 100;
-        const minValue = 0;
-        const arrayLength = Math.floor(Math.random() * (maxLen - minLen)) + minLen;
-        for (let index = 0; index < arrayLength; index++) {
-            arr.push({
-                item: Math.floor(Math.random() * (maxValue - minValue)) + minValue,
-                state: ElementStates.Default
-            });
+    function getRandomArr(): TResult[] {
+        const result: TResult[] = [];
+        const min = 3;
+        const max = 17;
+        const maxLength = Math.floor(Math.random() * (max - min)) + min;
+        for (let i = 0; i < maxLength; i++) {
+            result.push(
+                {
+                    value: Math.floor(Math.random() * 100),
+                    state: ElementStates.Default
+                }
+            );
         }
-        setArray(arr);
+        return result;
     }
-    const swap = (arr: TArrayElements[], firstIndex: number, secondIndex: number): void => {
+
+    function swap(arr: TResult[], firstIndex: number, secondIndex: number): void {
         const temp = arr[firstIndex];
         arr[firstIndex] = arr[secondIndex];
         arr[secondIndex] = temp;
     };
 
-    async function selectionSort(arr: TArrayElements[], type: 'asc' | 'desc') {
+    async function selectionSort(arr: TResult[], type: 'asc' | 'desc') {
+
         arr.forEach(item => item.state = ElementStates.Default);
-        setArray([...arr]);
-        for (let i = 0; i <= array.length - 1; i++) {
+        setResult([...arr]);
+
+        setIsValid(false);
+        if (type === 'asc') setIsLoaderASC(true);
+        if (type === 'desc') setIsLoaderDESC(true);
+
+        for (let i = 0; i <= arr.length - 1; i++) {
             let maxInd = i;
-            arr[i].state = ElementStates.Changing;
+
             for (let j = i + 1; j < arr.length; j++) {
+
+                arr[i].state = ElementStates.Changing;
                 arr[j].state = ElementStates.Changing;
-                setArray([...arr]);
-                await delay(DELAY_IN_MS);
+                setResult([...arr]);
+                await delay(SHORT_DELAY_IN_MS);
                 arr[j].state = ElementStates.Default;
-                setArray([...arr]);
-                if (type === 'asc' && arr[j].item < arr[maxInd].item) {
-                    arr[maxInd].state = ElementStates.Default;
-                    maxInd = j
-                    arr[maxInd].state = ElementStates.Changing;
-                }
-                ;
-                if (type === 'desc' && arr[j].item > arr[maxInd].item) {
-                    arr[maxInd].state = ElementStates.Default;
-                    maxInd = j;
-                    arr[maxInd].state = ElementStates.Changing;
-                }
+                setResult([...arr]);
+
+                if (type === 'asc' && arr[j].value < arr[maxInd].value) maxInd = j;
+                if (type === 'desc' && arr[j].value > arr[maxInd].value) maxInd = j;
+
             }
             swap(arr, i, maxInd);
+
             arr[maxInd].state = ElementStates.Default;
             arr[i].state = ElementStates.Modified;
-            setArray([...arr]);
+            setResult([...arr]);
         }
+
+        if (type === 'asc') setIsLoaderASC(false);
+        if (type === 'desc') setIsLoaderDESC(false);
+        setIsValid(true);
     }
 
-    async function bubbleSort(arr: TArrayElements[], type: 'asc' | 'desc') {
+    async function bubbleSort(arr: TResult[], type: 'asc' | 'desc') {
+
         arr.forEach(item => item.state = ElementStates.Default);
-        setArray([...arr]);
-        for (let i = 0; i < arr.length - 1; i++) {
+        setResult([...arr]);
+
+        setIsValid(false);
+        if (type === 'asc') setIsLoaderASC(true);
+        if (type === 'desc') setIsLoaderDESC(true);
+
+        for (let i = 0; i < arr.length; i++) {
             for (let j = 0; j < arr.length - i - 1; j++) {
+
                 arr[j].state = ElementStates.Changing;
                 arr[j + 1].state = ElementStates.Changing;
-                await delay(DELAY_IN_MS);
-                setArray([...arr]);
-                if ((type === 'asc' && arr[j].item > arr[j + 1].item) || (type === 'desc' && arr[j].item < arr[j + 1].item)) {
+                setResult([...arr]);
+                await delay(SHORT_DELAY_IN_MS);
+
+                if ((type === 'asc' && arr[j].value > arr[j + 1].value) ||
+                    (type === 'desc' && arr[j].value < arr[j + 1].value)) {
                     swap(arr, j, j + 1);
                 }
+
                 arr[j].state = ElementStates.Default;
                 arr[j + 1].state = ElementStates.Default;
-                await delay(DELAY_IN_MS);
-                setArray([...arr]);
+                setResult([...arr]);
             }
             arr[arr.length - i - 1].state = ElementStates.Modified;
         }
-        arr[0].state = ElementStates.Modified;
-        setArray([...arr])
+
+        if (type === 'asc') setIsLoaderASC(false);
+        if (type === 'desc') setIsLoaderDESC(false);
+        setIsValid(true);
     }
 
-    const clearForm = () => {
-        setIsLoader(false);
-        setIsLoaderDesc(false);
-        setIsLoaderAsc(false);
-        setAlgorithm('');
+    function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+
+        const typeOfBtn = document.activeElement?.getAttribute('name');
+        const typeOfSort = (document.querySelector('input[name="typeOfSort"]:checked') as HTMLInputElement).value;
+
+        switch (typeOfBtn) {
+            case 'newArr':
+                setResult(getRandomArr());
+                break;
+            case 'asc':
+                if (typeOfSort === 'Selection') selectionSort(result, 'asc');
+                if (typeOfSort === 'Bubble') bubbleSort(result, 'asc');
+                break;
+            case 'desc':
+                if (typeOfSort === 'Selection') selectionSort(result, 'desc');
+                if (typeOfSort === 'Bubble') bubbleSort(result, 'desc');
+                break;
+            default:
+                break;
+        }
+
     }
-    useEffect(() => {
-        randomArr();
-    }, []);
+
     return (
         <SolutionLayout title="Сортировка массива">
             <div className={style.container}>
-                <form className={style.form} onSubmit={handleSubmit}>
+                <form className={`${style.form}`} onSubmit={handleSubmit}>
                     <div className={style.groupButton}>
-                        <RadioInput label="Выбор" onClick={() => {
-                            !algorithm || algorithm === 'bubble' ? setAlgorithm('choice') : setAlgorithm('')
-                        }}
-                                    checked={algorithm === 'choice'}/>
-                        <RadioInput label="Пузырек" onClick={() => {
-                            !algorithm || algorithm === 'choice' ? setAlgorithm('bubble') : setAlgorithm('')
-                        }}
-                                    checked={algorithm === 'bubble'}/>
+                        <RadioInput
+                            data-testid="radioSelection"
+                            name="typeOfSort"
+                            label="Выбор"
+                            value="Selection"
+                            defaultChecked={true}
+                            disabled={!isValid}
+                        />
+                        <RadioInput
+                            data-testid="radioBubble"
+                            name="typeOfSort"
+                            label="Пузырёк"
+                            value="Bubble"
+                            disabled={!isValid}
+                        />
                     </div>
                     <div className={style.groupButton}>
-                        <Button type="button" text="По возрастанию" sorting={Direction.Ascending} isLoader={isLoaderAsc}
-                                disabled={isLoaderDesc}
-                                onClick={() => {
-                                    array && algorithm && setIsLoaderAsc(true);
-                                    array && algorithm === 'bubble' && bubbleSort(array, 'asc').then(() => clearForm())
-                                    array && algorithm === 'choice' && selectionSort(array, 'asc').then(() => clearForm())
-                                }}/>
-                        <Button type="button" text="По убыванию" sorting={Direction.Descending} isLoader={isLoaderDesc}
-                                disabled={isLoaderAsc}
-                                onClick={() => {
-                                    array && algorithm && setIsLoaderDesc(true);
-                                    array && algorithm === 'bubble' && bubbleSort(array, 'desc').then(() => clearForm())
-                                    array && algorithm === 'choice' && selectionSort(array, 'desc').then(() => clearForm())
-                                }}/>
+                        <Button
+                            data-testid="buttonASC"
+                            name="asc"
+                            type="submit"
+                            text="По возрастанию"
+                            sorting={Direction.Ascending}
+                            isLoader={isLoaderASC}
+                            disabled={!isValid}
+                            extraClass={`${style.btn}`}
+                        />
+                        <Button
+                            data-testid="buttonDESC"
+                            name="desc"
+                            type="submit"
+                            text="По убыванию"
+                            sorting={Direction.Descending}
+                            isLoader={isLoaderDESC}
+                            disabled={!isValid}
+                            extraClass={`${style.btn}`}
+                        />
                     </div>
-                    <Button type="button" onClick={handleSubmit} text="Новый массив" isLoader={isLoader}
-                            disabled={isLoaderAsc || isLoaderDesc}/>
+                    <Button
+                        data-testid="buttonNewArr"
+                        name="newArr"
+                        type="submit"
+                        text="Новый массив"
+                        isLoader={false}
+                        disabled={!isValid}
+                        extraClass={`${style.btn}`}
+                    />
                 </form>
-                <div className={style.result}>
+                <div className={`${style.result}`} data-testid="resultLayout">
                     {
-                        array.map((item, index) => {
-                            return <Column index={item.item} key={index} state={item.state}/>
+                        result.map((item, index) => {
+                            return <Column
+                                key={index}
+                                index={item.value}
+                                state={item.state}
+                            />
                         })
                     }
                 </div>
