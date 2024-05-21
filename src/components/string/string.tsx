@@ -100,15 +100,17 @@ export const StringComponent: React.FC = () => {
                         isLoader={isLoader}
                         disabled={!isValid}
                         data-cy="button"
+                        id='startAlgorithm'
                     />
                 </form>
-                <div className={`${style.resulty}`} data-testid="resultLayout" data-cy="board">
+                <div className={`${style.result}`} data-testid="resultLayout" data-cy="result">
                     {
                         result.map((item, index) => {
                             return <Circle
                                 key={index}
                                 letter={item.value}
                                 state={item.state}
+
                             />
                         })
                     }
