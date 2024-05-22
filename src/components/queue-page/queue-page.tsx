@@ -96,15 +96,15 @@ export const QueuePage: React.FC = () => {
                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                    setValue(e.target.value)
                                }} value={value}/>
-                        <Button text="Добавить" type='button' onClick={() => enqueue(value).then(()=>setIsLoaderEnqueue(false))}
+                        <Button id='buttonAdd' text="Добавить" type='button' onClick={() => enqueue(value).then(()=>setIsLoaderEnqueue(false))}
                                 disabled={!isValid.addButton} isLoader={isLoaderEnqueue}/>
-                        <Button text="Удалить" type='button' onClick={() => dequeue().then(()=>setIsLoaderDequeue(false))}
+                        <Button id='buttonDelete' text="Удалить" type='button' onClick={() => dequeue().then(()=>setIsLoaderDequeue(false))}
                                 disabled={!isValid.resetButton} isLoader={isLoaderDequeue}/>
                     </div>
                     <Button text="Очистить" type='reset' onClick={() => resetForm()} disabled={!isValid.resetButton}/>
                 </div>
             </form>
-            <div className={style.containerResult}>
+            <div className={style.containerResult} data-cy="result">
                 {
                     resultArray.map((item, index) => {
                         return <Circle
