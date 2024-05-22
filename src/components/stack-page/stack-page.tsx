@@ -69,7 +69,7 @@ export const StackPage: React.FC = () => {
                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                    setValue(e.target.value)
                                }} value={value}/>
-                        <Button text="Добавить" type='button' onClick={() => addElement(value).then(()=>setIsLoaderAdd(false))}
+                        <Button id="buttonAdd" text="Добавить" type='button' onClick={() => addElement(value).then(()=>setIsLoaderAdd(false))}
                                 disabled={!isValid.addButton} isLoader={isLoaderAdd}/>
                         <Button text="Удалить" type='button' onClick={() => popElement().then(()=>setIsLoaderPop(false))}
                                 disabled={!isValid.resetButton} isLoader={isLoaderPop}/>
@@ -77,7 +77,7 @@ export const StackPage: React.FC = () => {
                     <Button text="Очистить" type='reset' onClick={() => resetForm()} disabled={!isValid.resetButton}/>
                 </div>
             </form>
-            <div className={style.containerResult}>
+            <div className={style.containerResult} data-cy="result">
                 {
                     result.map((item, index) =>
                         <Circle key={index} letter={item.element} index={index}

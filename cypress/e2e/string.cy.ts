@@ -21,7 +21,6 @@ describe('check string', function (){
         });
         wait(DELAY_IN_MS);
         cy.get(containerSelector).children().each((item, index) => {
-            console.log(item);
             if(index === 0 || index === 3) {
                 cy.wrap(item.children()[1]).should("have.css", "border-color", changingColor);
             } else {
@@ -43,4 +42,9 @@ describe('check string', function (){
             cy.wrap(item.children()[1]).should("have.a.property", "textContent", (inputValue[inputValue.length - 1 - index]));
         });
     })
-})
+    it('clear input and check button', function(){
+        cy.visit('/recursion');
+        cy.get('input').clear();
+        cy.get('button').should('be.disabled');
+    })
+});
