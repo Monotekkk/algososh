@@ -101,7 +101,7 @@ export const QueuePage: React.FC = () => {
                         <Button id='buttonDelete' text="Удалить" type='button' onClick={() => dequeue().then(()=>setIsLoaderDequeue(false))}
                                 disabled={!isValid.resetButton} isLoader={isLoaderDequeue}/>
                     </div>
-                    <Button text="Очистить" type='reset' onClick={() => resetForm()} disabled={!isValid.resetButton}/>
+                    <Button id='buttonClear' text="Очистить" type='reset' onClick={() => resetForm()} disabled={!isValid.resetButton}/>
                 </div>
             </form>
             <div className={style.containerResult} data-cy="result">
