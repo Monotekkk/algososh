@@ -46,12 +46,12 @@ export const FibonacciPage: React.FC = () => {
       <div className={style.container}>
         <form className={style.form} onSubmit={handleSubmit}>
           <div className={style.column}>
-            <Input type="number" extraClass={style.input} min={1} max={19} value={inputValue} onChange={handleInput} />
+            <Input type="number" extraClass={style.input} min={1} max={19} value={inputValue} onChange={handleInput} data-cy="input"/>
             <p className={style.pre}>Максимальное число — 19</p>
           </div>
-          <Button type="submit" text="Рассчитать" disabled={!isValid} isLoader={isLoader} />
+          <Button type="submit" text="Рассчитать" disabled={!isValid} isLoader={isLoader} id={'startAlgorithm'} data-cy="button"/>
         </form>
-        <div className={style.result}>
+        <div className={style.result} data-cy="result">
           {
             result.map((item, index) => {
               return <Circle key={index} letter={item.toString()} index={index} extraClass="mb-20" />

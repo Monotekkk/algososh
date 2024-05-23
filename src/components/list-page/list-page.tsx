@@ -269,7 +269,7 @@ export const ListPage: React.FC = () => {
         setResultArr([...coloredArr]);
         await delay(SHORT_DELAY_IN_MS);
 
-        result.deleteTail();
+        result.deleteByIndex(index);
 
         coloredArr = getColoredArray(result.toArray());
         setResultArr([...coloredArr]);
@@ -302,6 +302,7 @@ export const ListPage: React.FC = () => {
                     maxLength={maxLength}
                     extraClass={`${style.input}`}
                     value={inputValue}
+                    id='inputValue'
                 />
                 <Button
                     name="addToHead"
@@ -311,6 +312,7 @@ export const ListPage: React.FC = () => {
                     disabled={!isValidAddToHead}
                     isLoader={isLoaderAddToHead}
                     extraClass={`${style.btn}`}
+                    id='addToHead'
                 />
                 <Button
                     name="addToTail"
@@ -320,8 +322,10 @@ export const ListPage: React.FC = () => {
                     disabled={!isValidAddToTail}
                     isLoader={isLoaderAddToTail}
                     extraClass={`${style.btn}`}
+                    id='addToTail'
                 />
                 <Button
+                    id='removeFromHead'
                     name="removeFromHead"
                     type="button"
                     text="Удалить из head"
@@ -331,6 +335,7 @@ export const ListPage: React.FC = () => {
                     extraClass={`${style.btn}`}
                 />
                 <Button
+                    id={'removeFromTail'}
                     name="removeFromTail"
                     type="button"
                     text="Удалить из tail"
@@ -346,6 +351,7 @@ export const ListPage: React.FC = () => {
                     onChange={handleInputIndex}
                     extraClass={`${style.input}`}
                     value={inputIndex}
+                    id={'inputIndex'}
                 />
                 <Button
                     name="addbyIndex"
@@ -355,6 +361,7 @@ export const ListPage: React.FC = () => {
                     disabled={!isValidAddbyIndex}
                     isLoader={isLoaderAddbyIndex}
                     extraClass={`${style.btnIndex}`}
+                    id={'addbyIndex'}
                 />
                 <Button
                     name="removebyIndex"
@@ -364,9 +371,10 @@ export const ListPage: React.FC = () => {
                     disabled={!isValidRemovebyIndex}
                     isLoader={isLoaderRemovebyIndex}
                     extraClass={`${style.btnIndex}`}
+                    id={'removebyIndex'}
                 />
             </form>
-            <ul className={`${style.board}`}>
+            <ul className={`${style.board}`} data-cy="result">
                 {
                     resultArr.map((item, index) => {
                         return <li className={`${style.element}`} key={index}>
